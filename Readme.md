@@ -1,7 +1,7 @@
 # Проект «Киноман»
 
 * Студент: [Евгений Попов](https://up.htmlacademy.ru/ecmascript/14/user/1406803).
-* Наставник: `Неизвестно`.
+* Наставник: [Артур Галимов](https://up.htmlacademy.ru/ecmascript/14/user/1237543).
 
 ---
 
