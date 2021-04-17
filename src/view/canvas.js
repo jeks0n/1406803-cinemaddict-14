@@ -1,18 +1,16 @@
 import {createElement} from '../utils';
 
-const createStatisticTemplate = (films) => {
-  const filmsLength = films.length;
-  return `<p>${filmsLength} movies inside</p>`;
+const createCanvasTemplate = () => {
+  return '<section class="films"></section>';
 };
 
-export default class Statistic {
-  constructor(films) {
-    this._films = films;
+export default class Canvas {
+  constructor() {
     this._element = null;
   }
 
   getTemplate() {
-    return createStatisticTemplate(this._films);
+    return createCanvasTemplate();
   }
 
   getElement() {
