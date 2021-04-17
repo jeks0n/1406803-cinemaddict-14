@@ -1,7 +1,7 @@
 import {createElement} from '../utils';
 
 const createCanvasTemplate = () => {
-  return `<section class="films"></section>`;
+  return '<section class="films"></section>';
 };
 
 export default class Canvas {
