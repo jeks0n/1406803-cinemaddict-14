@@ -1,12 +1,42 @@
-import {getHumanDate} from '../utils';
+import {createElement, getHumanDate} from '../utils';
 import {createCommentTemplate} from './comment';
 
 const getFilmComments = (filmCommentsIds, allComments) => {
   return allComments.slice().filter(({id}) => filmCommentsIds.includes(id));
 };
 
-export const createFilmDetailsTemplate = (film, allComments) => {
-  const filmComments = getFilmComments(film.comments, allComments);
+const getListCommaSeparatedTemplate = (list) => {
+  return `${list.join(', ')}`;
+};
+
+const getGenresTemplate = (genres) => {
+  return `${genres.map((genre) => `<span class="film-details__genre">${genre}</span>`).join('')}`;
+};
+
+const createFilmDetailTemplate = (film, allComments) => {
+  const {
+    title,
+    originalTitle,
+    ageRating,
+    director,
+    writers,
+    actors,
+    country,
+    description,
+    ratio,
+    duration,
+    poster,
+    genres,
+    premiere,
+    comments,
+  } = film;
+  const writersTemplate = getListCommaSeparatedTemplate(writers);
+  const actorsTemplate = getListCommaSeparatedTemplate(actors);
+  const genresTemplate = getGenresTemplate(genres);
+  const humanPremiereDate = getHumanDate(premiere);
+  const filmComments = getFilmComments(comments, allComments);
+  const commentsLength = comments.length;
+  const commentsTemplate = filmComments.map(createCommentTemplate).join('');
 
   return `<section class="film-details">
   <form class="film-details__inner" action="" method="get">
@@ -16,58 +46,58 @@ export const createFilmDetailsTemplate = (film, allComments) => {
       </div>
       <div class="film-details__info-wrap">
         <div class="film-details__poster">
-          <img class="film-details__poster-img" src="${film.poster}" alt="">
+          <img class="film-details__poster-img" src="${poster}" alt="">
 
-          <p class="film-details__age">${film.ageRating}+</p>
+          <p class="film-details__age">${ageRating}+</p>
         </div>
 
         <div class="film-details__info">
           <div class="film-details__info-head">
             <div class="film-details__title-wrap">
-              <h3 class="film-details__title">${film.title}</h3>
-              <p class="film-details__title-original">Original: ${film.originalTitle}</p>
+              <h3 class="film-details__title">${title}</h3>
+              <p class="film-details__title-original">Original: ${originalTitle}</p>
             </div>
 
             <div class="film-details__rating">
-              <p class="film-details__total-rating">${film.ratio}</p>
+              <p class="film-details__total-rating">${ratio}</p>
             </div>
           </div>
 
           <table class="film-details__table">
             <tr class="film-details__row">
               <td class="film-details__term">Director</td>
-              <td class="film-details__cell">${film.director}</td>
+              <td class="film-details__cell">${director}</td>
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Writers</td>
-              <td class="film-details__cell">${film.writers.join(', ')}</td>
+              <td class="film-details__cell">${writersTemplate}</td>
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Actors</td>
-              <td class="film-details__cell">${film.actors.join(', ')}</td>
+              <td class="film-details__cell">${actorsTemplate}</td>
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Release Date</td>
-              <td class="film-details__cell">${getHumanDate(film.premiere)}</td>
+              <td class="film-details__cell">${humanPremiereDate}</td>
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Runtime</td>
-              <td class="film-details__cell">${film.duration}</td>
+              <td class="film-details__cell">${duration}</td>
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Country</td>
-              <td class="film-details__cell">${film.country}</td>
+              <td class="film-details__cell">${country}</td>
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Genres</td>
               <td class="film-details__cell">
-                ${film.genres.map((genre) => `<span class="film-details__genre">${genre}</span>`).join('')}
+                ${genresTemplate}
               </td>
             </tr>
           </table>
 
           <p class="film-details__film-description">
-            ${film.description}
+            ${description}
           </p>
         </div>
       </div>
@@ -86,10 +116,10 @@ export const createFilmDetailsTemplate = (film, allComments) => {
 
     <div class="film-details__bottom-container">
       <section class="film-details__comments-wrap">
-        <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${filmComments.length}</span></h3>
+        <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${commentsLength}</span></h3>
 
         <ul class="film-details__comments-list">
-          ${filmComments.map(createCommentTemplate).join('')}
+          ${commentsTemplate}
         </ul>
 
         <div class="film-details__new-comment">
@@ -126,3 +156,27 @@ export const createFilmDetailsTemplate = (film, allComments) => {
   </form>
 </section>`;
 };
+
+export default class FilmDetail {
+  constructor(film, allComments) {
+    this._film = film;
+    this._allComments = allComments;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createFilmDetailTemplate(this._film, this._allComments);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
