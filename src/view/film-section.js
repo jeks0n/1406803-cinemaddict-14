@@ -1,22 +1,22 @@
 import {createElement} from '../utils';
 import {SECTION_EXTRA_TYPE} from '../const';
 
-const createFilmSectionTemplate = (sectionName, sectionType) => {
-  if (sectionType === SECTION_EXTRA_TYPE) {
+const createFilmSectionTemplate = (title, type) => {
+  if (type === SECTION_EXTRA_TYPE) {
     return `<section class="films-list films-list--extra">
-      <h2 class="films-list__title">${sectionName}</h2>
+      <h2 class="films-list__title">${title}</h2>
     </section>`;
   }
 
   return `<section class="films-list">
-      <h2 class="films-list__title visually-hidden">${sectionName}</h2>
+      <h2 class="films-list__title visually-hidden">${title}</h2>
     </section>`;
 };
 
 export default class FilmSection {
-  constructor(sectionName, sectionType) {
-    this._name = sectionName;
-    this._type = sectionType;
+  constructor(title, type) {
+    this._name = title;
+    this._type = type;
     this._element = null;
   }
 
