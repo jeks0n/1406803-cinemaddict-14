@@ -6,18 +6,19 @@ const DEGREE_SPECIFICATIONS = [
   ['Movie Buff', [21, Infinity]],
 ];
 
-const getDegree = (films) => {
-  const watchedCount = films.filter(({userDetails}) => userDetails.alreadyWatched).length;
-  const [degree]= DEGREE_SPECIFICATIONS.find(([, range]) => (watchedCount >= range[0] && watchedCount <= range[1]));
-
-  return degree;
-};
-
 const createProfileTemplate = (films) => {
-  return `<section class="header__profile profile">
-     <p class="profile__rating">${getDegree(films)}</p>
+  const watchedCount = films.filter(({userDetails}) => userDetails.alreadyWatched).length;
+
+  if (watchedCount > 0) {
+    const [degree] = DEGREE_SPECIFICATIONS.find(([, range]) => (watchedCount >= range[0] && watchedCount <= range[1]));
+
+    return `<section class="header__profile profile">
+     <p class="profile__rating">${degree}</p>
      <img class="profile__avatar" src="images/bitmap@2x.png" alt="Avatar" width="35" height="35">
    </section>`;
+  }
+
+  return ' ';
 };
 
 export default class Profile {

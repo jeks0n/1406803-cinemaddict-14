@@ -20,8 +20,16 @@ export const RenderPosition = {
 
 export const SECTION_EXTRA_TYPE = 'extra';
 
-export const SectionTitle = {
-  all: 'All movies. Upcoming',
-  topRated: 'Top rated',
-  mostCommented: 'Most commented',
+export const SectionSettings = {
+  ALL: {
+    title: 'All movies. Upcoming',
+  },
+  TOP_RATED: {
+    title: 'Top rated',
+    type: SECTION_EXTRA_TYPE,
+  },
+  MOST_COMMENTED: {
+    title: 'Most commented',
+    type: SECTION_EXTRA_TYPE,
+  },
 };
