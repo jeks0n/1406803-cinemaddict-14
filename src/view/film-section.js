@@ -1,4 +1,4 @@
-import {createElement} from '../utils';
+import AbstractView from './abstract';
 import {SECTION_EXTRA_TYPE} from '../const';
 
 const createFilmSectionTemplate = (title, type) => {
@@ -13,26 +13,14 @@ const createFilmSectionTemplate = (title, type) => {
     </section>`;
 };
 
-export default class FilmSection {
+export default class FilmSection extends AbstractView {
   constructor(title, type) {
+    super();
     this._name = title;
     this._type = type;
-    this._element = null;
   }
 
   getTemplate() {
     return createFilmSectionTemplate(this._name, this._type);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

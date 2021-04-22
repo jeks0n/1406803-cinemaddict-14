@@ -1,5 +1,6 @@
-import {createElement, getHumanDate} from '../utils';
-import {createCommentTemplate} from './comment';
+import AbstractView from './abstract';
+import CommentView from './comment';
+import {getHumanDate} from '../utils/common';
 
 const getFilmComments = (filmCommentsIds, allComments) => {
   return allComments.slice().filter(({id}) => filmCommentsIds.includes(id));
@@ -36,7 +37,7 @@ const createFilmDetailTemplate = (film, allComments) => {
   const humanPremiereDate = getHumanDate(premiere);
   const filmComments = getFilmComments(comments, allComments);
   const commentsLength = comments.length;
-  const commentsTemplate = filmComments.map(createCommentTemplate).join('');
+  const commentsTemplate = filmComments.map((film) => new CommentView(film).getTemplate()).join('');
 
   return `<section class="film-details">
   <form class="film-details__inner" action="" method="get">
@@ -157,26 +158,27 @@ const createFilmDetailTemplate = (film, allComments) => {
 </section>`;
 };
 
-export default class FilmDetail {
+export default class FilmDetail extends AbstractView {
   constructor(film, allComments) {
+    super();
     this._film = film;
     this._allComments = allComments;
-    this._element = null;
+
+    this._closeFilmPopupHandler = this._closeFilmPopupHandler.bind(this);
   }
 
   getTemplate() {
     return createFilmDetailTemplate(this._film, this._allComments);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
+  _closeFilmPopupHandler(evt) {
+    evt.preventDefault();
+    this._callback.closePopupClick();
   }
 
-  removeElement() {
-    this._element = null;
+  setClosePopupHandler(callback) {
+    this._callback.closePopupClick = callback;
+    this.getElement().querySelector('.film-details__close-btn')
+      .addEventListener('click', this._closeFilmPopupHandler);
   }
 }

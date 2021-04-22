@@ -1,6 +1,7 @@
-import {getHumanDateTime} from '../utils';
+import AbstractView from './abstract';
+import {getHumanDateTime} from '../utils/common';
 
-export const createCommentTemplate = (comment) => {
+const createCommentTemplate = (comment) => {
   return `<li class="film-details__comment">
             <span class="film-details__comment-emoji">
               <img src="${comment.emotion}" width="55" height="55" alt="emoji-smile">
@@ -15,3 +16,16 @@ export const createCommentTemplate = (comment) => {
             </div>
           </li>`;
 };
+
+export default class Comment extends AbstractView {
+  constructor(comment) {
+    super();
+    this._comment = comment;
+  }
+
+  getTemplate() {
+    return createCommentTemplate(this._comment);
+  }
+}
+
+
