@@ -1,4 +1,4 @@
-import {createElement} from '../utils';
+import AbstractView from './abstract';
 
 const DEGREE_SPECIFICATIONS = [
   ['Novice', [1, 10]],
@@ -21,25 +21,13 @@ const createProfileTemplate = (films) => {
   return ' ';
 };
 
-export default class Profile {
+export default class Profile extends AbstractView {
   constructor(films) {
+    super();
     this._films = films;
-    this._element = null;
   }
 
   getTemplate() {
     return createProfileTemplate(this._films);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

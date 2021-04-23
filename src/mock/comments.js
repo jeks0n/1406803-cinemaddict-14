@@ -1,4 +1,4 @@
-import {createDataIds, getRandomArrayElement, getRandomDate} from '../utils';
+import {createDataIds, getRandomArrayElement, getRandomDate} from '../utils/common';
 
 const TEXTS = [
   'Interesting setting and a good cast',

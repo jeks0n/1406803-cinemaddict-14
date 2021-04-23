@@ -1,27 +1,11 @@
-import {createElement} from '../utils';
+import AbstractView from './abstract';
 
 const createCanvasTemplate = () => {
   return '<section class="films"></section>';
 };
 
-export default class Canvas {
-  constructor() {
-    this._element = null;
-  }
-
+export default class Canvas extends AbstractView {
   getTemplate() {
     return createCanvasTemplate();
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
