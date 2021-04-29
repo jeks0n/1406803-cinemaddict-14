@@ -1,6 +1,6 @@
 import AbstractView from './abstract';
 import CommentView from './comment';
-import {getHumanDate} from '../utils/common';
+import {getHumanDate, getCheckedAttribute} from '../utils/common';
 
 const getFilmComments = (filmCommentsIds, allComments) => {
   return allComments.slice().filter(({id}) => filmCommentsIds.includes(id));
@@ -30,6 +30,7 @@ const createFilmDetailTemplate = (film, allComments) => {
     genres,
     premiere,
     comments,
+    userDetails,
   } = film;
   const writersTemplate = getListCommaSeparatedTemplate(writers);
   const actorsTemplate = getListCommaSeparatedTemplate(actors);
@@ -38,6 +39,9 @@ const createFilmDetailTemplate = (film, allComments) => {
   const filmComments = getFilmComments(comments, allComments);
   const commentsLength = comments.length;
   const commentsTemplate = filmComments.map((film) => new CommentView(film).getTemplate()).join('');
+  const favoriteAttribute = getCheckedAttribute(userDetails.isFavorite);
+  const alreadyWatchedAttribute = getCheckedAttribute(userDetails.isAlreadyWatched);
+  const watchListAttribute = getCheckedAttribute(userDetails.isWatchList);
 
   return `<section class="film-details">
   <form class="film-details__inner" action="" method="get">
@@ -104,13 +108,13 @@ const createFilmDetailTemplate = (film, allComments) => {
       </div>
 
       <section class="film-details__controls">
-        <input type="checkbox" class="film-details__control-input visually-hidden" id="watchlist" name="watchlist">
+        <input type="checkbox" ${watchListAttribute} class="film-details__control-input visually-hidden" id="watchlist" name="watchlist">
         <label for="watchlist" class="film-details__control-label film-details__control-label--watchlist">Add to watchlist</label>
 
-        <input type="checkbox" class="film-details__control-input visually-hidden" id="watched" name="watched">
+        <input type="checkbox" ${alreadyWatchedAttribute} class="film-details__control-input visually-hidden" id="watched" name="watched">
         <label for="watched" class="film-details__control-label film-details__control-label--watched">Already watched</label>
 
-        <input type="checkbox" class="film-details__control-input visually-hidden" id="favorite" name="favorite">
+        <input type="checkbox" ${favoriteAttribute} class="film-details__control-input visually-hidden" id="favorite" name="favorite">
         <label for="favorite" class="film-details__control-label film-details__control-label--favorite">Add to favorites</label>
       </section>
     </div>
@@ -165,6 +169,9 @@ export default class FilmDetail extends AbstractView {
     this._allComments = allComments;
 
     this._closeFilmPopupHandler = this._closeFilmPopupHandler.bind(this);
+    this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
+    this._watchListClickHandler = this._watchListClickHandler.bind(this);
+    this._alreadyWatchedClickHandler = this._alreadyWatchedClickHandler.bind(this);
   }
 
   getTemplate() {
@@ -176,9 +183,42 @@ export default class FilmDetail extends AbstractView {
     this._callback.closePopupClick();
   }
 
+  _favoriteClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.favoriteClick();
+  }
+
+  _watchListClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.watchListClick();
+  }
+
+  _alreadyWatchedClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.alreadyWatchedClick();
+  }
+
   setClosePopupHandler(callback) {
     this._callback.closePopupClick = callback;
     this.getElement().querySelector('.film-details__close-btn')
       .addEventListener('click', this._closeFilmPopupHandler);
+  }
+
+  setFavoriteClickHandler(callback) {
+    this._callback.favoriteClick = callback;
+    this.getElement().querySelector('.film-details__control-label--favorite')
+      .addEventListener('click', this._favoriteClickHandler);
+  }
+
+  setWatchListClickHandler(callback) {
+    this._callback.watchListClick = callback;
+    this.getElement().querySelector('.film-details__control-label--watchlist')
+      .addEventListener('click', this._watchListClickHandler);
+  }
+
+  setAlreadyWatchedClickHandler(callback) {
+    this._callback.alreadyWatchedClick = callback;
+    this.getElement().querySelector('.film-details__control-label--watched')
+      .addEventListener('click', this._alreadyWatchedClickHandler);
   }
 }

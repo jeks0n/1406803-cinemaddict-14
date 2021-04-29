@@ -100,9 +100,9 @@ const generateFilm = (id, comments) => {
     ageRating: 0,
     comments: [...Array(getRandomInteger(0, 5))].map(getRandomArrayElement(comments)).map((comment) => comment.id),
     userDetails: {
-      watchlist: Math.random() < 0.5,
-      alreadyWatched: Math.random() < 0.5,
-      favorite: Math.random() < 0.5,
+      isWatchList: Math.random() < 0.5,
+      isAlreadyWatched: Math.random() < 0.5,
+      isFavorite: Math.random() < 0.5,
       watchingDate: getRandomDate(new Date(2010, 0, 1), new Date()),
     },
   };
