@@ -22,14 +22,14 @@ export const SECTION_EXTRA_TYPE = 'extra';
 
 export const SectionSettings = {
   ALL: {
-    title: 'All movies. Upcoming',
+    TITLE: 'All movies. Upcoming',
   },
   TOP_RATED: {
-    title: 'Top rated',
-    type: SECTION_EXTRA_TYPE,
+    TITLE: 'Top rated',
+    TYPE: SECTION_EXTRA_TYPE,
   },
   MOST_COMMENTED: {
-    title: 'Most commented',
-    type: SECTION_EXTRA_TYPE,
+    TITLE: 'Most commented',
+    TYPE: SECTION_EXTRA_TYPE,
   },
 };
