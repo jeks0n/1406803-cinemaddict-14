@@ -7,7 +7,7 @@ const DEGREE_SPECIFICATIONS = [
 ];
 
 const createProfileTemplate = (films) => {
-  const watchedCount = films.filter(({userDetails}) => userDetails.alreadyWatched).length;
+  const watchedCount = films.filter(({userDetails}) => userDetails.isAlreadyWatched).length;
 
   if (watchedCount > 0) {
     const [degree] = DEGREE_SPECIFICATIONS.find(([, range]) => (watchedCount >= range[0] && watchedCount <= range[1]));
