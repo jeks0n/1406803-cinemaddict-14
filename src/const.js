@@ -33,3 +33,9 @@ export const SectionSettings = {
     TYPE: SECTION_EXTRA_TYPE,
   },
 };
+
+export const SortType = {
+  DEFAULT: 'default',
+  DATE: 'date',
+  RATIO: 'rating',
+};
