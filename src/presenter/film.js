@@ -49,9 +49,12 @@ export default class Film {
       return render(this._filmListContainer, this._filmComponent);
     }
 
+    if (this._mode === Mode.OPENED) {
+      this._filmDetailComponent.restoreHandlers();
+    }
+
     replace(this._filmComponent, prevFilmComponent);
     replace(this._filmDetailComponent, prevDetailComponent);
-
     remove(prevFilmComponent);
     remove(prevDetailComponent);
   }
@@ -70,7 +73,7 @@ export default class Film {
   }
 
   _closeFilmPopup() {
-    this._filmDetailComponent.getElement().remove();
+    remove(this._filmDetailComponent);
     this._siteBodyElement.classList.remove('hide-overflow');
     document.removeEventListener('keydown', this._escKeyDownHandler);
     this._mode = Mode.DEFAULT;
@@ -78,6 +81,7 @@ export default class Film {
 
   _openFilmPopup() {
     document.addEventListener('keydown', this._escKeyDownHandler);
+    this._filmDetailComponent.restoreHandlers();
     this._siteBodyElement.appendChild(this._filmDetailComponent.getElement());
     this._siteBodyElement.classList.add('hide-overflow');
     this._filmDetailComponent.setClosePopupHandler(this._closeFilmPopup);
@@ -93,46 +97,37 @@ export default class Film {
 
   _handleFavoriteClick() {
     this._changeData(
-      Object.assign(
-        {},
-        this._film,
-        {
-          userDetails: {
-            ...this._film.userDetails,
-            isFavorite: !this._film.userDetails.isFavorite,
-          },
+      {
+        ...this._film,
+        userDetails: {
+          ...this._film.userDetails,
+          isFavorite: !this._film.userDetails.isFavorite,
         },
-      ),
+      },
     );
   }
 
   _handleWatchListClick() {
     this._changeData(
-      Object.assign(
-        {},
-        this._film,
-        {
-          userDetails: {
-            ...this._film.userDetails,
-            isWatchList: !this._film.userDetails.isWatchList,
-          },
+      {
+        ...this._film,
+        userDetails: {
+          ...this._film.userDetails,
+          isWatchList: !this._film.userDetails.isWatchList,
         },
-      ),
+      },
     );
   }
 
   _handleAlreadyWatchedClick() {
     this._changeData(
-      Object.assign(
-        {},
-        this._film,
-        {
-          userDetails: {
-            ...this._film.userDetails,
-            isAlreadyWatched: !this._film.userDetails.isAlreadyWatched,
-          },
+      {
+        ...this._film,
+        userDetails: {
+          ...this._film.userDetails,
+          isAlreadyWatched: !this._film.userDetails.isAlreadyWatched,
         },
-      ),
+      },
     );
   }
 }

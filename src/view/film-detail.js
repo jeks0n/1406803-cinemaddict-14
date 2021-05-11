@@ -1,4 +1,4 @@
-import AbstractView from './abstract';
+import SmartView from './smart.js';
 import CommentView from './comment';
 import {getHumanDate, getCheckedAttribute} from '../utils/common';
 
@@ -14,7 +14,7 @@ const getGenresTemplate = (genres) => {
   return `${genres.map((genre) => `<span class="film-details__genre">${genre}</span>`).join('')}`;
 };
 
-const createFilmDetailTemplate = (film, allComments) => {
+const createFilmDetailTemplate = (data, allComments) => {
   const {
     title,
     originalTitle,
@@ -31,7 +31,9 @@ const createFilmDetailTemplate = (film, allComments) => {
     premiere,
     comments,
     userDetails,
-  } = film;
+    localCommentEmotion,
+    localComment,
+  } = data;
   const writersTemplate = getListCommaSeparatedTemplate(writers);
   const actorsTemplate = getListCommaSeparatedTemplate(actors);
   const genresTemplate = getGenresTemplate(genres);
@@ -42,6 +44,10 @@ const createFilmDetailTemplate = (film, allComments) => {
   const favoriteAttribute = getCheckedAttribute(userDetails.isFavorite);
   const alreadyWatchedAttribute = getCheckedAttribute(userDetails.isAlreadyWatched);
   const watchListAttribute = getCheckedAttribute(userDetails.isWatchList);
+  const localCommentEmotionTemplate = localCommentEmotion ?
+    `<img src="images/emoji/${localCommentEmotion}.png" width="55" height="55" alt="emoji-${localCommentEmotion}">`
+    : '';
+  const localCommentText = localComment ? localComment : '';
 
   return `<section class="film-details">
   <form class="film-details__inner" action="" method="get">
@@ -128,10 +134,10 @@ const createFilmDetailTemplate = (film, allComments) => {
         </ul>
 
         <div class="film-details__new-comment">
-          <div class="film-details__add-emoji-label"></div>
+          <div class="film-details__add-emoji-label">${localCommentEmotionTemplate}</div>
 
           <label class="film-details__comment-label">
-            <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment"></textarea>
+            <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${localCommentText}</textarea>
           </label>
 
           <div class="film-details__emoji-list">
@@ -162,20 +168,24 @@ const createFilmDetailTemplate = (film, allComments) => {
 </section>`;
 };
 
-export default class FilmDetail extends AbstractView {
+export default class FilmDetail extends SmartView {
   constructor(film, allComments) {
     super();
-    this._film = film;
+    this._data = FilmDetail.parseFilmToState(film);
     this._allComments = allComments;
 
     this._closeFilmPopupHandler = this._closeFilmPopupHandler.bind(this);
     this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
     this._watchListClickHandler = this._watchListClickHandler.bind(this);
     this._alreadyWatchedClickHandler = this._alreadyWatchedClickHandler.bind(this);
+    this._localCommentEmotionHandler = this._localCommentEmotionHandler.bind(this);
+    this._localCommentInputHandler = this._localCommentInputHandler.bind(this);
+
+    this._localCommentTextElement = this.getElement().querySelector('.film-details__comment-input');
   }
 
   getTemplate() {
-    return createFilmDetailTemplate(this._film, this._allComments);
+    return createFilmDetailTemplate(this._data, this._allComments);
   }
 
   _closeFilmPopupHandler(evt) {
@@ -185,39 +195,112 @@ export default class FilmDetail extends AbstractView {
 
   _favoriteClickHandler(evt) {
     evt.preventDefault();
-    this._callback.favoriteClick();
+    this._callback.detailFavoriteClick();
   }
 
   _watchListClickHandler(evt) {
     evt.preventDefault();
-    this._callback.watchListClick();
+    this._callback.detailWatchListClick();
   }
 
   _alreadyWatchedClickHandler(evt) {
     evt.preventDefault();
-    this._callback.alreadyWatchedClick();
+    this._callback.detailAlreadyWatchedClick();
+  }
+
+  static parseFilmToState(film) {
+    return {
+      ...film,
+      localComment: null,
+      localCommentEmotion: null,
+      scrollTop: null,
+    };
+  }
+
+  static parseStateToFilm(data) {
+    data = {
+      ...data,
+    };
+
+    delete data.localComment;
+    delete data.localCommentEmotion;
+    delete data.scrollTop;
+
+    return data;
+  }
+
+  _restorePosition() {
+    this.getElement().scrollTop = this._data.scrollTop;
+    this.getElement().querySelector('.film-details__comment-input').scrollTop = this._data.localCommentScrollTop;
+  }
+
+  restoreHandlers() {
+    this._setInnerHandlers();
+  }
+
+  _setInnerHandlers() {
+    this.setFavoriteClickHandler();
+    this.setWatchListClickHandler();
+    this.setAlreadyWatchedClickHandler();
+    this.setClosePopupHandler();
+    this.getElement().querySelector('.film-details__emoji-list')
+      .querySelectorAll('input')
+      .forEach((element) => element.addEventListener('click', this._localCommentEmotionHandler));
+    this.getElement().querySelector('.film-details__comment-input')
+      .addEventListener('input', this._localCommentInputHandler);
+  }
+
+  _localCommentEmotionHandler(evt) {
+    evt.preventDefault();
+    this.updateData({
+      localCommentEmotion: evt.target.value,
+      scrollTop: this.getElement().scrollTop,
+    });
+    this._restorePosition();
+  }
+
+  _localCommentInputHandler(evt) {
+    evt.preventDefault();
+    this.updateData({
+      localComment: evt.target.value,
+      scrollTop: this.getElement().scrollTop,
+      localCommentScrollTop: evt.target.scrollTop,
+    }, true);
+    this._restorePosition();
   }
 
   setClosePopupHandler(callback) {
-    this._callback.closePopupClick = callback;
+    if (callback) {
+      this._callback.closePopupClick = callback;
+    }
+
     this.getElement().querySelector('.film-details__close-btn')
       .addEventListener('click', this._closeFilmPopupHandler);
   }
 
   setFavoriteClickHandler(callback) {
-    this._callback.favoriteClick = callback;
+    if (callback) {
+      this._callback.detailFavoriteClick = callback;
+    }
+
     this.getElement().querySelector('.film-details__control-label--favorite')
       .addEventListener('click', this._favoriteClickHandler);
   }
 
   setWatchListClickHandler(callback) {
-    this._callback.watchListClick = callback;
+    if (callback) {
+      this._callback.detailWatchListClick = callback;
+    }
+
     this.getElement().querySelector('.film-details__control-label--watchlist')
       .addEventListener('click', this._watchListClickHandler);
   }
 
   setAlreadyWatchedClickHandler(callback) {
-    this._callback.alreadyWatchedClick = callback;
+    if (callback) {
+      this._callback.detailAlreadyWatchedClick = callback;
+    }
+
     this.getElement().querySelector('.film-details__control-label--watched')
       .addEventListener('click', this._alreadyWatchedClickHandler);
   }

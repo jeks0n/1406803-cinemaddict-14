@@ -7,7 +7,7 @@ import SiteMenuView from './view/site-menu';
 import {generateFilter} from './mock/filter';
 import StatisticView from './view/statistic';
 
-const FILMS_COUNT = 20;
+const FILMS_COUNT = 5;
 const TOTAL_COMMENTS_COUNT = 20;
 
 const comments = generateComments(TOTAL_COMMENTS_COUNT);

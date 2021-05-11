@@ -8,6 +8,10 @@ export const extendFilm = (film, title) => {
   };
 };
 
-export const sortByDate = (filmA, filmB) => filmB.premiere - filmA.premiere;
-
-export const sortByRatio = (filmA, filmB) => filmB.ratio - filmA.ratio;
+export const updatePresenterFilm = (presenter, updatedFilm) => {
+  return {
+    ...updatedFilm,
+    componentId: presenter._film.componentId,
+    sectionTitle: presenter._film.sectionTitle,
+  };
+};

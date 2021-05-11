@@ -5,7 +5,7 @@ import FilmSectionView from '../view/film-section';
 import NoFilmSectionView from '../view/no-film-section';
 import {RenderPosition, SectionSettings, SortType} from '../const';
 import {updateItem} from '../utils/common';
-import {extendFilm, sortByDate, sortByRatio} from '../utils/film';
+import {extendFilm, updatePresenterFilm} from '../utils/film';
 import FilmListView from '../view/film-list';
 import LoadMoreButtonView from '../view/load-more-button';
 import {remove} from '../utils/render';
@@ -44,8 +44,9 @@ export default class Canvas {
   }
 
   init(films, comments) {
-    this._films = films.map((film) => extendFilm(film, SectionSettings.ALL.TITLE));
-    this._sourcedFilms = films.slice();
+    this._films = films;
+    this._allFilms = films.map((film) => extendFilm(film, SectionSettings.ALL.TITLE));
+    this._sourcedAllFilms = this._allFilms.slice();
     this._topRatedFilms = this._films.slice().sort((a, b) => b.ratio - a.ratio).slice(0, SPECIAL_SECTION_SIZE)
       .map((film) => extendFilm(film, SectionSettings.TOP_RATED.TITLE));
     this._mostCommentedFilms = this._films.slice().sort((a, b) => b.comments.length - a.comments.length)
@@ -66,22 +67,26 @@ export default class Canvas {
 
   _handleFilmChange(updatedFilm) {
     this._films = updateItem(this._films, updatedFilm);
+    this._allFilms = updateItem(this._allFilms, extendFilm(updatedFilm, SectionSettings.ALL.TITLE));
+    this._sourcedAllFilms = updateItem(this._sourcedAllFilms, extendFilm(updatedFilm, SectionSettings.ALL.TITLE));
     Object
       .values(this._filmPresenter)
       .filter(({_film}) => _film.id === updatedFilm.id)
-      .forEach((presenter) => presenter.init(updatedFilm, this._comments));
+      .forEach((presenter) => {
+        presenter.init(updatePresenterFilm(presenter, updatedFilm), this._comments);
+      });
   }
 
   _sortFilms(sortType) {
     switch (sortType) {
       case SortType.DATE:
-        this._films.sort(sortByDate);
+        this._allFilms.sort((filmA, filmB) => filmB.premiere - filmA.premiere);
         break;
       case SortType.RATIO:
-        this._films.sort(sortByRatio);
+        this._allFilms.sort((filmA, filmB) => filmB.ratio - filmA.ratio);
         break;
       default:
-        this._films = this._sourcedFilms.map((film) => extendFilm(film, SectionSettings.ALL.TITLE));
+        this._allFilms = this._sourcedAllFilms;
     }
 
     this._currentSortType = sortType;
@@ -134,9 +139,9 @@ export default class Canvas {
 
   _renderAllFilmSection() {
     render(this._allFilmSectionComponent, this._allFilmListComponent);
-    this._renderFilmList(this._allFilmListComponent, this._films.slice(0, FILMS_VISIBILITY_STEP));
+    this._renderFilmList(this._allFilmListComponent, this._allFilms.slice(0, FILMS_VISIBILITY_STEP));
 
-    if (this._films.length > FILMS_VISIBILITY_STEP) {
+    if (this._allFilms.length > FILMS_VISIBILITY_STEP) {
       this._renderLoadMoreButton();
     }
 
@@ -145,10 +150,10 @@ export default class Canvas {
 
   _handleLoadMoreButtonClick() {
     const newEndPosition = this._renderedFilmCount + FILMS_VISIBILITY_STEP;
-    this._renderFilmList(this._allFilmListComponent, this._films.slice(this._renderedFilmCount, newEndPosition));
+    this._renderFilmList(this._allFilmListComponent, this._allFilms.slice(this._renderedFilmCount, newEndPosition));
     this._renderedFilmCount += FILMS_VISIBILITY_STEP;
 
-    if (this._renderedFilmCount >= this._films.length) {
+    if (this._renderedFilmCount >= this._allFilms.length) {
       remove(this._loadMoreButtonComponent);
     }
   }
@@ -168,7 +173,7 @@ export default class Canvas {
   _renderCanvas() {
     render(this._siteMainElement, this._canvasComponent);
 
-    if (this._films.length === 0) {
+    if (this._allFilms.length === 0) {
       return this._renderNoFilmSection();
     }
 
