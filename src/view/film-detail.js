@@ -1,6 +1,7 @@
 import SmartView from './smart.js';
 import CommentView from './comment';
-import {getHumanDate, getCheckedAttribute} from '../utils/common';
+import {getCheckedAttribute} from '../utils/common';
+import {getHumanDate} from '../utils/date';
 
 const getFilmComments = (filmCommentsIds, allComments) => {
   return allComments.slice().filter(({id}) => filmCommentsIds.includes(id));
@@ -11,7 +12,10 @@ const getListCommaSeparatedTemplate = (list) => {
 };
 
 const getGenresTemplate = (genres) => {
-  return `${genres.map((genre) => `<span class="film-details__genre">${genre}</span>`).join('')}`;
+  return `<td className="film-details__term">${genres.length > 1 ? 'Genres' : 'Genre'}</td>
+          <td className="film-details__cell">
+            ${genres.map((genre) => `<span class="film-details__genre">${genre}</span>`).join('')}
+          </td>`;
 };
 
 const createFilmDetailTemplate = (data, allComments) => {
@@ -100,10 +104,7 @@ const createFilmDetailTemplate = (data, allComments) => {
               <td class="film-details__cell">${country}</td>
             </tr>
             <tr class="film-details__row">
-              <td class="film-details__term">Genres</td>
-              <td class="film-details__cell">
-                ${genresTemplate}
-              </td>
+              ${genresTemplate}
             </tr>
           </table>
 

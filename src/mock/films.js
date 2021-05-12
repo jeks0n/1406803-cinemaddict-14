@@ -1,4 +1,5 @@
-import {getRandomInteger, getRandomArrayElement, getRandomDate, createDataIds} from '../utils/common';
+import {getRandomInteger, getRandomArrayElement, createDataIds} from '../utils/common';
+import {getRandomDate} from '../utils/date';
 
 const TITLES = [
   'The Terminator',
