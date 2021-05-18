@@ -49,6 +49,11 @@ const getDuration = (timeAgoInSeconds) => {
 
 export const getTimeAgo = (date) => {
   const timeAgoInSeconds = Math.floor((new Date() - new Date(date)) / 1000);
+
+  if (timeAgoInSeconds === 0) {
+    return 'now';
+  }
+
   const {interval, period} = getDuration(timeAgoInSeconds);
   const suffix = interval === 1 ? '' : 's';
 
