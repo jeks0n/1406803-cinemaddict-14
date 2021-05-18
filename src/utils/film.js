@@ -7,11 +7,3 @@ export const extendFilm = (film, title) => {
     sectionTitle: title,
   };
 };
-
-export const updatePresenterFilm = (presenter, updatedFilm) => {
-  return {
-    ...updatedFilm,
-    componentId: presenter._film.componentId,
-    sectionTitle: presenter._film.sectionTitle,
-  };
-};

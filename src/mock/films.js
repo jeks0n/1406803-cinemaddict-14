@@ -1,6 +1,7 @@
 import {getRandomInteger, getRandomArrayElement, createDataIds} from '../utils/common';
 import {getRandomDate} from '../utils/date';
 
+const MINIMUM_FRACTION_DIGITS = 1;
 const TITLES = [
   'The Terminator',
   'Commando',
@@ -88,7 +89,7 @@ const generateFilm = (id, comments) => {
     id,
     title: getRandomArrayElement(TITLES)(),
     originalTitle: getRandomArrayElement(ORIGINAL_TITLES)(),
-    ratio: getRandomInteger(10, 100) / 10,
+    ratio: (getRandomInteger(10, 100) / 10).toFixed(MINIMUM_FRACTION_DIGITS),
     poster: `./images/posters/${getRandomArrayElement(POSTERS)()}`,
     director: getRandomArrayElement(DIRECTORS)(),
     writers: [...Array(getRandomInteger(1, 4))].map(getRandomArrayElement(WRITERS)),
