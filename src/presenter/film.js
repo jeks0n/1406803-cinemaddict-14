@@ -1,6 +1,7 @@
 import {remove, render, replace} from '../utils/render';
 import FilmView from '../view/film';
 import FilmDetailView from '../view/film-detail';
+import {UserAction, UpdateType} from '../const.js';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -8,7 +9,8 @@ const Mode = {
 };
 
 export default class Film {
-  constructor(filmListContainer, siteBodyElement, changeData, changeMode) {
+  constructor(filmListContainer, siteBodyElement, changeData, changeMode, commentsModel) {
+    this._commentsModel = commentsModel;
     this._filmListContainer = filmListContainer;
     this._siteBodyElement = siteBodyElement;
     this._changeData = changeData;
@@ -22,46 +24,61 @@ export default class Film {
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
     this._handleWatchListClick = this._handleWatchListClick.bind(this);
     this._handleAlreadyWatchedClick = this._handleAlreadyWatchedClick.bind(this);
+    this._handleDeleteCommentClick = this._handleDeleteCommentClick.bind(this);
+    this._handleAddCommentCommand = this._handleAddCommentCommand.bind(this);
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
     this._closeFilmPopup = this._closeFilmPopup.bind(this);
   }
 
-  init(film, comments) {
+  init(film, updateType) {
     this._film = film;
-    this._comments = comments;
 
     const prevFilmComponent = this._filmComponent;
     const prevDetailComponent = this._filmDetailComponent;
 
-    this._filmComponent = new FilmView(this._film);
-    this._filmDetailComponent = new FilmDetailView(this._film, this._comments);
+    if (!this.isOpen() || updateType === UpdateType.PATCH) {
+      this._filmComponent = new FilmView(this._film);
+      this._filmComponent.setOpenPopupHandler(this._openFilmPopup);
+      this._filmComponent.setFavoriteClickHandler(this._handleFavoriteClick);
+      this._filmComponent.setWatchListClickHandler(this._handleWatchListClick);
+      this._filmComponent.setAlreadyWatchedClickHandler(this._handleAlreadyWatchedClick);
+    }
 
-    this._filmComponent.setOpenPopupHandler(this._openFilmPopup);
-    this._filmComponent.setFavoriteClickHandler(this._handleFavoriteClick);
-    this._filmComponent.setWatchListClickHandler(this._handleWatchListClick);
-    this._filmComponent.setAlreadyWatchedClickHandler(this._handleAlreadyWatchedClick);
+    this._filmDetailComponent = new FilmDetailView(this._film, this._getComments());
     this._filmDetailComponent.setFavoriteClickHandler(this._handleFavoriteClick);
     this._filmDetailComponent.setWatchListClickHandler(this._handleWatchListClick);
     this._filmDetailComponent.setAlreadyWatchedClickHandler(this._handleAlreadyWatchedClick);
+    this._filmDetailComponent.setCommentDeleteClickHandler(this._handleDeleteCommentClick);
+    this._filmDetailComponent.setLocalCommentAddToFilmHandler(this._handleAddCommentCommand);
     this._filmDetailComponent.setClosePopupHandler(this._closeFilmPopup);
 
-    if (prevFilmComponent === null || prevDetailComponent === null) {
+
+    if (prevFilmComponent === null && prevDetailComponent === null) {
       return render(this._filmListContainer, this._filmComponent);
     }
 
-    if (this._mode === Mode.OPENED) {
+    if (this.isOpen()) {
       this._filmDetailComponent.restoreHandlers();
+      replace(this._filmDetailComponent, prevDetailComponent);
     }
 
-    replace(this._filmComponent, prevFilmComponent);
-    replace(this._filmDetailComponent, prevDetailComponent);
-    remove(prevFilmComponent);
-    remove(prevDetailComponent);
+    if (prevFilmComponent !== null) {
+      replace(this._filmComponent, prevFilmComponent);
+      remove(prevFilmComponent);
+    }
+  }
+
+  _getComments() {
+    return this._commentsModel.getComments();
   }
 
   destroy() {
     remove(this._filmComponent);
     remove(this._filmDetailComponent);
+  }
+
+  partialDestroy() {
+    remove(this._filmComponent);
   }
 
   _escKeyDownHandler(evt) {
@@ -95,8 +112,14 @@ export default class Film {
     }
   }
 
+  isOpen() {
+    return this._mode === Mode.OPENED;
+  }
+
   _handleFavoriteClick() {
     this._changeData(
+      UserAction.UPDATE_FILM,
+      UpdateType.MINOR,
       {
         ...this._film,
         userDetails: {
@@ -109,6 +132,8 @@ export default class Film {
 
   _handleWatchListClick() {
     this._changeData(
+      UserAction.UPDATE_FILM,
+      UpdateType.MINOR,
       {
         ...this._film,
         userDetails: {
@@ -121,12 +146,40 @@ export default class Film {
 
   _handleAlreadyWatchedClick() {
     this._changeData(
+      UserAction.UPDATE_FILM,
+      UpdateType.MINOR,
       {
         ...this._film,
         userDetails: {
           ...this._film.userDetails,
           isAlreadyWatched: !this._film.userDetails.isAlreadyWatched,
         },
+      },
+    );
+  }
+
+  _handleDeleteCommentClick(commentId) {
+    this._changeData(
+      UserAction.DELETE_COMMENT,
+      UpdateType.MINOR,
+      {
+        ...this._film,
+        comments: this._film.comments.filter((comment) => comment !== commentId ),
+      },
+    );
+
+    this._commentsModel.deleteComment(UserAction.DELETE_COMMENT, commentId);
+  }
+
+  _handleAddCommentCommand(update) {
+    this._commentsModel.addComment(UserAction.ADD_COMMENT, update);
+
+    this._changeData(
+      UserAction.ADD_COMMENT,
+      UpdateType.MINOR,
+      {
+        ...this._film,
+        comments: [...this._film.comments, update.id],
       },
     );
   }
