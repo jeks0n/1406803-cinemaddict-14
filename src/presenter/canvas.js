@@ -224,6 +224,22 @@ export default class Canvas {
     }
   }
 
+  hide() {
+    this._allFilmSectionComponent.hide();
+    this._topRatedSectionComponent.hide();
+    this._mostCommentedSectionComponent.hide();
+    this._noFilmComponent.hide();
+    this._sortComponent.hide();
+  }
+
+  show() {
+    this._allFilmSectionComponent.show();
+    this._topRatedSectionComponent.show();
+    this._mostCommentedSectionComponent.show();
+    this._noFilmComponent.show();
+    this._sortComponent.show();
+  }
+
   _resetOpenedFilmPresenter() {
     if (!this._openedFilmPresenter) {
       return;
@@ -233,7 +249,7 @@ export default class Canvas {
       return this._openedFilmPresenter = null;
     }
 
-    const updatedFilm = this._getAllFilms().filter((film) => film.id === this._openedFilmPresenter._film.id)[0];
+    const updatedFilm = this._filmsModel.getFilms().filter((film) => film.id === this._openedFilmPresenter._film.id)[0];
     this._openedFilmPresenter.init(updatedFilm);
   }
 

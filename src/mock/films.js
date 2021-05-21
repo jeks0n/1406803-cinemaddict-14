@@ -94,7 +94,7 @@ const generateFilm = (id, comments) => {
     writers: [...Array(getRandomInteger(1, 4))].map(getRandomArrayElement(WRITERS)),
     actors: [...Array(getRandomInteger(1, 4))].map(getRandomArrayElement(ACTORS)),
     premiere: getRandomDate(new Date(1984, 0, 1), new Date()),
-    duration: `1h ${getRandomInteger(0, 59)}m`,
+    duration: getRandomInteger(50, 180),
     country: getRandomArrayElement(COUNTRIES)(),
     genres: [...Array(getRandomInteger(1, 3))].map(getRandomArrayElement(GENRES)),
     description: [...Array(getRandomInteger(1, 5))].map(getRandomArrayElement(DESCRIPTIONS)).join(' '),
@@ -104,7 +104,7 @@ const generateFilm = (id, comments) => {
       isWatchList: Math.random() < 0.5,
       isAlreadyWatched: Math.random() < 0.5,
       isFavorite: Math.random() < 0.5,
-      watchingDate: getRandomDate(new Date(2010, 0, 1), new Date()),
+      watchingDate: getRandomDate(new Date(2021, 1, 15), new Date()),
     },
   };
 };

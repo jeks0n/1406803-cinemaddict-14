@@ -1,24 +1,16 @@
 import AbstractView from './abstract';
-
-const DEGREE_SPECIFICATIONS = [
-  ['Novice', [1, 10]],
-  ['Fan', [11, 20]],
-  ['Movie Buff', [21, Infinity]],
-];
+import {getDegree} from '../utils/profile';
 
 const createProfileTemplate = (films) => {
-  const watchedCount = films.filter(({userDetails}) => userDetails.isAlreadyWatched).length;
-
-  if (watchedCount > 0) {
-    const [degree] = DEGREE_SPECIFICATIONS.find(([, range]) => (watchedCount >= range[0] && watchedCount <= range[1]));
-
-    return `<section class="header__profile profile">
+  const degree = getDegree(films);
+  const profileTemplate = degree === null
+    ? ' '
+    : `<section class="header__profile profile">
      <p class="profile__rating">${degree}</p>
      <img class="profile__avatar" src="images/bitmap@2x.png" alt="Avatar" width="35" height="35">
    </section>`;
-  }
 
-  return ' ';
+  return profileTemplate;
 };
 
 export default class Profile extends AbstractView {

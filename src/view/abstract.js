@@ -22,6 +22,14 @@ export default class Abstract {
     return this._element;
   }
 
+  show() {
+    this.getElement().style.display = '';
+  }
+
+  hide() {
+    this.getElement().style.display = 'none';
+  }
+
   removeElement() {
     this._element = null;
   }
