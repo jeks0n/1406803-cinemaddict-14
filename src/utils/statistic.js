@@ -1,5 +1,5 @@
 import {getElementFrequency} from '../utils/common';
-import {Color, PeriodName, PeriodDuration, OtherDuration} from '../const';
+import {PeriodName, PeriodDuration, OtherDuration} from '../const';
 
 const getTotalInfo = (films) => {
   return films.reduce((accumulator, item) => {
