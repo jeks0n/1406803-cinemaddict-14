@@ -57,3 +57,34 @@ export const FilterType = {
   HISTORY: 'history',
   FAVORITES: 'favorites',
 };
+
+export const MenuItem = {
+  FILTER: 'FILTER',
+  STATISTICS: 'STATISTICS',
+};
+
+export const PeriodName = {
+  ALL_TIME: 'allTime',
+  YEAR: 'year',
+  MONTH: 'month',
+  WEEK: 'week',
+  DAY: 'day',
+  HOUR: 'hour',
+  MINUTE: 'minute',
+  SECOND: 'second',
+};
+
+export const PeriodDuration = {
+  [PeriodName.YEAR]: 31536000,
+  [PeriodName.MONTH]: 2592000,
+  [PeriodName.WEEK]: 604800,
+  [PeriodName.DAY]: 86400,
+  [PeriodName.HOUR]: 3600,
+  [PeriodName.MINUTE]: 60,
+  [PeriodName.SECOND]: 1,
+};
+
+export const OtherDuration = {
+  MILLISECONDS_IN_SECONDS: 1000,
+  MINUTES_IN_HOUR: 60,
+};

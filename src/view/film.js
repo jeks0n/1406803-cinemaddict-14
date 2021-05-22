@@ -1,15 +1,20 @@
 import AbstractView from './abstract';
+import {getHumanDuration} from '../utils/date';
 
-const SHORT_DESCRIPTION_LENGTH = 139;
+const SHORT_DESCRIPTION_LENGTH = 140;
+const SHORT_POSTFIX = '…';
 
 const getShortDescription = (text) => {
-  return `${text.slice(0, SHORT_DESCRIPTION_LENGTH) + '…'}`;
+  return text.length > SHORT_DESCRIPTION_LENGTH
+    ? `${text.slice(0, SHORT_DESCRIPTION_LENGTH - SHORT_POSTFIX.length) + SHORT_POSTFIX}`
+    : text;
 };
 
 const createFilmCardTemplate = (film = {}) => {
   const {title, description, ratio, duration, poster, genres, premiere, comments, userDetails} = film;
   const shortDescription = getShortDescription(description);
   const [firstGenre] = genres;
+  const humanDuration = getHumanDuration(duration);
   const filmYear = premiere.getFullYear();
   const commentsLength = comments.length;
 
@@ -30,7 +35,7 @@ const createFilmCardTemplate = (film = {}) => {
        <p class="film-card__rating">${ratio}</p>
        <p class="film-card__info">
          <span class="film-card__year">${filmYear}</span>
-         <span class="film-card__duration">${duration}</span>
+         <span class="film-card__duration">${humanDuration}</span>
          <span class="film-card__genre">${firstGenre}</span>
        </p>
        <img src="${poster}" alt="" class="film-card__poster">

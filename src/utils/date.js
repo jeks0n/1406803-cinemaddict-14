@@ -1,14 +1,6 @@
-import {MONTH_NAMES} from '../const';
+import {MONTH_NAMES, PeriodName, PeriodDuration, OtherDuration} from '../const';
 
 const TWO = 2;
-const PERIODS = [
-  ['year', 31536000],
-  ['month', 2592000],
-  ['day', 86400],
-  ['hour', 3600],
-  ['minute', 60],
-  ['second', 1],
-];
 
 export const getRandomDate = (begin, end) => {
   return new Date(begin.getTime() + Math.random() * (end.getTime() - begin.getTime()));
@@ -34,8 +26,26 @@ export const getHumanDateTime = (date) => {
   return `${years}/${months}/${days} ${hours}:${minutes}:${seconds}`;
 };
 
-const getDuration = (timeAgoInSeconds) => {
-  for (const [name, seconds] of PERIODS) {
+export const getHouresFromDuration = (duration) => Math.floor(duration/OtherDuration.MINUTES_IN_HOUR);
+export const getRestMinutesFromDuration = (duration) => duration % OtherDuration.MINUTES_IN_HOUR;
+export const getHumanDuration = (duration) => {
+  const hours = getHouresFromDuration(duration);
+  const minutes = getRestMinutesFromDuration(duration);
+
+  return hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
+};
+
+const getPeriod = (timeAgoInSeconds) => {
+  const periods = [
+    [PeriodName.YEAR, PeriodDuration[PeriodName.YEAR]],
+    [PeriodName.MONTH, PeriodDuration[PeriodName.MONTH]],
+    [PeriodName.DAY, PeriodDuration[PeriodName.DAY]],
+    [PeriodName.HOUR, PeriodDuration[PeriodName.HOUR]],
+    [PeriodName.MINUTE, PeriodDuration[PeriodName.MINUTE]],
+    [PeriodName.SECOND, PeriodDuration[PeriodName.SECOND]],
+  ];
+
+  for (const [name, seconds] of periods) {
     const interval = Math.floor(timeAgoInSeconds / seconds);
 
     if (interval >= 1) {
@@ -48,13 +58,13 @@ const getDuration = (timeAgoInSeconds) => {
 };
 
 export const getTimeAgo = (date) => {
-  const timeAgoInSeconds = Math.floor((new Date() - new Date(date)) / 1000);
+  const timeAgoInSeconds = Math.floor((new Date() - new Date(date)) / OtherDuration.MILLISECONDS_IN_SECONDS);
 
   if (timeAgoInSeconds === 0) {
     return 'now';
   }
 
-  const {interval, period} = getDuration(timeAgoInSeconds);
+  const {interval, period} = getPeriod(timeAgoInSeconds);
   const suffix = interval === 1 ? '' : 's';
 
   return `${interval} ${period}${suffix} ago`;
