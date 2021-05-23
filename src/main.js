@@ -7,13 +7,17 @@ import FooterStatisticPresenter from './presenter/footer-statistic';
 import FilmsModel from './model/films';
 import FilterModel from './model/filter';
 import CommentsModel from './model/comments';
-import {MenuItem} from './const';
+import {MenuItem, UpdateType} from './const';
+import Api from './api';
 
 const FILMS_COUNT = 20;
 const TOTAL_COMMENTS_COUNT = 20;
+const AUTHORIZATION = 'Basic kTy9gIdsz2317rD';
+const END_POINT = 'https://14.ecmascript.pages.academy/cinemaddict';
 
 const comments = generateComments(TOTAL_COMMENTS_COUNT);
 const films = generateFilms(FILMS_COUNT, comments);
+const api = new Api(END_POINT, AUTHORIZATION);
 
 const filmsModel = new FilmsModel();
 filmsModel.setFilms(films);
@@ -45,9 +49,17 @@ const handleSiteMenuClick = (menuType) => {
   }
 };
 
-filterPresenter.setMenuClickHandler(handleSiteMenuClick);
-filterPresenter.init();
+
 canvasPresenter.init();
 statisticPresenter.init();
 statisticPresenter.hide();
 footerStatisticPresenter.init();
+
+api.getFilms().then((films) => {
+  filmsModel.setFilms(UpdateType.INIT, films);
+  filterPresenter.setMenuClickHandler(handleSiteMenuClick);
+  filterPresenter.init();
+})
+  .catch(() => {
+    filmsModel.setFilms(UpdateType.INIT, []);
+  });
