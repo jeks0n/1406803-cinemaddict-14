@@ -3,6 +3,7 @@ import ProfilePresenter from './profile';
 import {render} from '../utils/render';
 import CanvasView from '../view/canvas';
 import FilmSectionView from '../view/film-section';
+import LoadingView from '../view/loading';
 import NoFilmSectionView from '../view/no-film-section';
 import {RenderPosition, SectionSettings, SortType} from '../const';
 import {extendFilm} from '../utils/film';
@@ -17,7 +18,7 @@ const FILMS_VISIBILITY_STEP = 5;
 const SPECIAL_SECTION_SIZE = 2;
 
 export default class Canvas {
-  constructor(siteMainElement, siteHeaderElement, siteBodyElement, filmsModel, filterModel, commentsModel) {
+  constructor(siteMainElement, siteHeaderElement, siteBodyElement, filmsModel, filterModel, commentsModel, api) {
     this._filmsModel = filmsModel;
     this._filterModel = filterModel;
     this._commentsModel = commentsModel;
@@ -28,6 +29,8 @@ export default class Canvas {
     this._filmPresenter = {};
     this._openedFilmPresenter = null;
     this._currentSortType = SortType.DEFAULT;
+    this._isLoading = true;
+    this._api = api;
 
     this._profileComponent = new ProfilePresenter(siteHeaderElement, filmsModel);
     this._sortComponent = null;
@@ -37,6 +40,7 @@ export default class Canvas {
     this._allFilmSectionComponent = new FilmSectionView(SectionSettings.ALL.TITLE);
     this._allFilmListComponent = new FilmListView();
     this._noFilmComponent = new NoFilmSectionView();
+    this._loadingComponent = new LoadingView();
 
     this._topRatedSectionComponent = new FilmSectionView(SectionSettings.TOP_RATED.TITLE, SectionSettings.TOP_RATED.TYPE);
     this._topRatedFilmListComponent = new FilmListView();
@@ -99,7 +103,9 @@ export default class Canvas {
   }
 
   _handleViewAction(actionType, updateType, update) {
-    this._filmsModel.updateFilm(updateType, update);
+    this._api.updateFilm(update).then((response) => {
+      this._filmsModel.updateFilm(updateType, response);
+    });
   }
 
   _handleModelEvent(updateType) {
@@ -110,6 +116,11 @@ export default class Canvas {
         break;
       case UpdateType.MAJOR:
         this._clearCanvas(({resetRenderedFilmCount: true, resetSortType: true}));
+        this._renderCanvas();
+        break;
+      case UpdateType.INIT:
+        this._isLoading = false;
+        remove(this._loadingComponent);
         this._renderCanvas();
         break;
     }
@@ -144,8 +155,12 @@ export default class Canvas {
     render(this._canvasComponent, this._noFilmComponent);
   }
 
+  _renderLoading() {
+    render(this._canvasComponent, this._loadingComponent);
+  }
+
   _renderFilm(container, film) {
-    const filmPresenter = new FilmPresenter(container, this._siteBodyElement, this._handleViewAction, this._handleModeChange, this._commentsModel);
+    const filmPresenter = new FilmPresenter(container, this._siteBodyElement, this._handleViewAction, this._handleModeChange, this._commentsModel, this._api);
     filmPresenter.init(film);
     this._filmPresenter[film.componentId] = filmPresenter;
   }
@@ -209,6 +224,7 @@ export default class Canvas {
 
     remove(this._sortComponent);
     remove(this._noFilmComponent);
+    remove(this._loadingComponent);
     remove(this._loadMoreButtonComponent);
     remove(this._topRatedSectionComponent);
     remove(this._mostCommentedSectionComponent);
@@ -254,16 +270,23 @@ export default class Canvas {
   }
 
   _renderCanvas() {
+    render(this._siteMainElement, this._canvasComponent);
+
+    if (this._isLoading === true) {
+      this._renderLoading();
+      return;
+    }
+
     this._renderSort(this._currentSortType);
     render(this._siteMainElement, this._canvasComponent);
+
     this._profileComponent.init();
 
-    if (this._getAllFilms().length === 0) {
+    if (this._getAllFilms().length === 0 && this._isLoading === false) {
       return this._renderNoFilmSection();
     }
 
     this._resetOpenedFilmPresenter();
-
     this._renderAllFilmSection();
 
     if (this._getTopRatedFilms()[0].ratio) {
