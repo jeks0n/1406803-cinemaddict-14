@@ -2,10 +2,6 @@ import {MONTH_NAMES, PeriodName, PeriodDuration, OtherDuration} from '../const';
 
 const TWO = 2;
 
-export const getRandomDate = (begin, end) => {
-  return new Date(begin.getTime() + Math.random() * (end.getTime() - begin.getTime()));
-};
-
 const addZeroBefore = (value, length = TWO) => `0${value}`.slice(-length);
 const getDayOfMonth = (date) => addZeroBefore(date.getDate());
 const getMonthNumber = (date) => addZeroBefore(date.getMonth());

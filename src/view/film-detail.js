@@ -310,7 +310,7 @@ export default class FilmDetail extends SmartView {
   _localCommentAddHandler(evt) {
     if ((evt.ctrlKey || evt.metaKey) && evt.keyCode === 13 && this._data.localCommentEmotion) {
       this._callback.localCommentAddToFilmHandler({
-        id: `f${(~~(Math.random()*1e8)).toString(16)}`,
+        // id: `f${(~~(Math.random()*1e8)).toString(16)}`,
         comment: this._data.localComment,
         emotion: this._data.localCommentEmotion,
       });

@@ -9,12 +9,13 @@ const Mode = {
 };
 
 export default class Film {
-  constructor(filmListContainer, siteBodyElement, changeData, changeMode, commentsModel) {
+  constructor(filmListContainer, siteBodyElement, changeData, changeMode, commentsModel, api) {
     this._commentsModel = commentsModel;
     this._filmListContainer = filmListContainer;
     this._siteBodyElement = siteBodyElement;
     this._changeData = changeData;
     this._changeMode = changeMode;
+    this._api = api;
 
     this._filmComponent = null;
     this._filmDetailComponent = null;
@@ -44,13 +45,8 @@ export default class Film {
       this._filmComponent.setAlreadyWatchedClickHandler(this._handleAlreadyWatchedClick);
     }
 
-    this._filmDetailComponent = new FilmDetailView(this._film, this._getComments());
-    this._filmDetailComponent.setFavoriteClickHandler(this._handleFavoriteClick);
-    this._filmDetailComponent.setWatchListClickHandler(this._handleWatchListClick);
-    this._filmDetailComponent.setAlreadyWatchedClickHandler(this._handleAlreadyWatchedClick);
-    this._filmDetailComponent.setCommentDeleteClickHandler(this._handleDeleteCommentClick);
-    this._filmDetailComponent.setLocalCommentAddToFilmHandler(this._handleAddCommentCommand);
-    this._filmDetailComponent.setClosePopupHandler(this._closeFilmPopup);
+    this._filmDetailComponent = new FilmDetailView(this._film, []);
+    this._setDetailComponent();
 
 
     if (prevFilmComponent === null && prevDetailComponent === null) {
@@ -59,7 +55,9 @@ export default class Film {
 
     if (this.isOpen()) {
       this._filmDetailComponent.restoreHandlers();
+      this._fetchComments();
       replace(this._filmDetailComponent, prevDetailComponent);
+      remove(prevDetailComponent);
     }
 
     if (prevFilmComponent !== null) {
@@ -68,8 +66,25 @@ export default class Film {
     }
   }
 
-  _getComments() {
-    return this._commentsModel.getComments();
+  _setDetailComponent() {
+    this._filmDetailComponent.setFavoriteClickHandler(this._handleFavoriteClick);
+    this._filmDetailComponent.setWatchListClickHandler(this._handleWatchListClick);
+    this._filmDetailComponent.setAlreadyWatchedClickHandler(this._handleAlreadyWatchedClick);
+    this._filmDetailComponent.setCommentDeleteClickHandler(this._handleDeleteCommentClick);
+    this._filmDetailComponent.setLocalCommentAddToFilmHandler(this._handleAddCommentCommand);
+    this._filmDetailComponent.setClosePopupHandler(this._closeFilmPopup);
+    this._filmDetailComponent.restoreHandlers();
+  }
+
+  _fetchComments() {
+    this._api.getComments(this._film).then((comments) => {
+      const prevDetailComponent = this._filmDetailComponent;
+      this._commentsModel.setComments(comments);
+      this._filmDetailComponent = new FilmDetailView(this._film, this._commentsModel.getComments());
+      this._setDetailComponent();
+      replace(this._filmDetailComponent, prevDetailComponent);
+      remove(prevDetailComponent);
+    });
   }
 
   destroy() {
@@ -104,6 +119,7 @@ export default class Film {
     this._filmDetailComponent.setClosePopupHandler(this._closeFilmPopup);
     this._changeMode();
     this._mode = Mode.OPENED;
+    this._fetchComments();
   }
 
   resetView() {
@@ -159,28 +175,28 @@ export default class Film {
   }
 
   _handleDeleteCommentClick(commentId) {
-    this._changeData(
-      UserAction.DELETE_COMMENT,
-      UpdateType.MINOR,
-      {
-        ...this._film,
-        comments: this._film.comments.filter((comment) => comment !== commentId ),
-      },
-    );
+    this._api.deleteComment(commentId).then(() => {
+      this._changeData(
+        UserAction.DELETE_COMMENT,
+        UpdateType.MINOR,
+        {
+          ...this._film,
+          comments: this._film.comments.filter((comment) => comment !== commentId ),
+        },
+      );
 
-    this._commentsModel.deleteComment(UserAction.DELETE_COMMENT, commentId);
+      this._commentsModel.deleteComment(UserAction.DELETE_COMMENT, commentId);
+    });
   }
 
   _handleAddCommentCommand(update) {
-    this._commentsModel.addComment(UserAction.ADD_COMMENT, update);
-
-    this._changeData(
-      UserAction.ADD_COMMENT,
-      UpdateType.MINOR,
-      {
-        ...this._film,
-        comments: [...this._film.comments, update.id],
-      },
-    );
+    this._api.addComment(this._film, update).then((result) => {
+      this._commentsModel.addComment(UserAction.ADD_COMMENT, result.comments);
+      this._changeData(
+        UserAction.ADD_COMMENT,
+        UpdateType.MINOR,
+        result.movie,
+      );
+    });
   }
 }

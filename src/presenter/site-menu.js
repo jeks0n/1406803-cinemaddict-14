@@ -3,7 +3,7 @@ import {render, replace, remove} from '../utils/render.js';
 import {filter, getFilterIdFromType} from '../utils/filter.js';
 import {FilterType, UpdateType, MenuItem} from '../const.js';
 
-export default class Filter {
+export default class SiteMenu {
   constructor(filterContainer, filterModel, filmsModel) {
     this._filterContainer = filterContainer;
     this._filterModel = filterModel;
@@ -38,6 +38,14 @@ export default class Filter {
 
   _handleModelEvent() {
     this.init();
+  }
+
+  show() {
+    this._filterComponent.show();
+  }
+
+  hide() {
+    this._filterComponent.hide();
   }
 
   _handleFilterTypeChange(menuItem) {

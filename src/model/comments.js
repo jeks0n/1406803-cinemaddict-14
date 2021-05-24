@@ -26,23 +26,18 @@ export default class Films extends Observer {
   }
 
   addComment(updateType, update) {
-    const {
-      id,
-      comment,
-      emotion,
-    } = update;
-
-    this._comments = [
-      ...this._comments,
-      {
-        id,
-        author: 'Crazy Horse',
-        comment,
-        emotion: `./images/emoji/${emotion}.png`,
-        date: new Date(),
-      },
-    ];
+    this._comments = update;
 
     this._notify(updateType, update);
+  }
+
+  static adaptToClient(comment) {
+    return {
+      ...comment,
+      date: comment.date !== null
+        ? new Date(comment.date)
+        : comment.date,
+      emotion: `./images/emoji/${comment.emotion}.png`,
+    };
   }
 }
