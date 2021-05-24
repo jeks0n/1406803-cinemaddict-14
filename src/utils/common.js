@@ -7,6 +7,7 @@ export const getHashCode = (string) => {
 };
 
 export const getCheckedAttribute = (flag) => flag ? 'checked' : '';
+export const getDisabledAttribute = (flag) => flag ? 'disabled' : '';
 
 export const getComponentId = (componentHash, id) => `${componentHash}-${id}`;
 

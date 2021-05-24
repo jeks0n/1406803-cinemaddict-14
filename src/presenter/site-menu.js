@@ -40,10 +40,6 @@ export default class SiteMenu {
     this.init();
   }
 
-  show() {
-    this._filterComponent.show();
-  }
-
   hide() {
     this._filterComponent.hide();
   }

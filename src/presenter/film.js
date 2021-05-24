@@ -186,6 +186,8 @@ export default class Film {
       );
 
       this._commentsModel.deleteComment(UserAction.DELETE_COMMENT, commentId);
+    }).catch(() => {
+      this._filmDetailComponent.shake(this._filmDetailComponent.rollBackChanges);
     });
   }
 
@@ -197,6 +199,8 @@ export default class Film {
         UpdateType.MINOR,
         result.film,
       );
+    }).catch(() => {
+      this._filmDetailComponent.shake(this._filmDetailComponent.rollBackChanges);
     });
   }
 }
