@@ -52,7 +52,7 @@ export default class Api {
       .then(Api.toJSON)
       .then((result) => {
         return {
-          movie: FilmsModel.adaptToClient(result.movie),
+          film: FilmsModel.adaptToClient(result.movie),
           comments: CommentsModel.adaptToClient(result.comments),
         };
       });

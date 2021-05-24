@@ -195,7 +195,7 @@ export default class Film {
       this._changeData(
         UserAction.ADD_COMMENT,
         UpdateType.MINOR,
-        result.movie,
+        result.film,
       );
     });
   }
