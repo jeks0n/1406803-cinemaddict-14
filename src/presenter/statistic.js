@@ -26,8 +26,4 @@ export default class Statistic {
   hide() {
     this._statisticComponent.hide();
   }
-
-  _getFilms() {
-    return this._filmsModel.getFilms();
-  }
 }
