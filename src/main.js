@@ -18,8 +18,8 @@ const filterModel = new FilterModel();
 const commentsModel = new CommentsModel();
 
 const siteBodyElement = document.querySelector('body');
-const siteHeaderElement = document.querySelector('.header');
-const siteMainElement = document.querySelector('.main');
+const siteHeaderElement = siteBodyElement.querySelector('.header');
+const siteMainElement = siteBodyElement.querySelector('.main');
 const siteFooterStatisticElement = document.querySelector('.footer__statistics');
 
 const canvasPresenter = new CanvasPresenter(siteMainElement, siteHeaderElement, siteBodyElement, filmsModel, filterModel, commentsModel, api);

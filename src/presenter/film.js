@@ -66,6 +66,25 @@ export default class Film {
     }
   }
 
+  destroy() {
+    remove(this._filmComponent);
+    remove(this._filmDetailComponent);
+  }
+
+  partialDestroy() {
+    remove(this._filmComponent);
+  }
+
+  resetView() {
+    if (this._mode !== Mode.DEFAULT) {
+      this._closeFilmPopup();
+    }
+  }
+
+  isOpen() {
+    return this._mode === Mode.OPENED;
+  }
+
   _setDetailComponent() {
     this._filmDetailComponent.setFavoriteClickHandler(this._handleFavoriteClick);
     this._filmDetailComponent.setWatchListClickHandler(this._handleWatchListClick);
@@ -85,15 +104,6 @@ export default class Film {
       replace(this._filmDetailComponent, prevDetailComponent);
       remove(prevDetailComponent);
     });
-  }
-
-  destroy() {
-    remove(this._filmComponent);
-    remove(this._filmDetailComponent);
-  }
-
-  partialDestroy() {
-    remove(this._filmComponent);
   }
 
   _escKeyDownHandler(evt) {
@@ -120,16 +130,6 @@ export default class Film {
     this._changeMode();
     this._mode = Mode.OPENED;
     this._fetchComments();
-  }
-
-  resetView() {
-    if (this._mode !== Mode.DEFAULT) {
-      this._closeFilmPopup();
-    }
-  }
-
-  isOpen() {
-    return this._mode === Mode.OPENED;
   }
 
   _handleFavoriteClick() {

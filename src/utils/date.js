@@ -4,23 +4,9 @@ const TWO = 2;
 
 const addZeroBefore = (value, length = TWO) => `0${value}`.slice(-length);
 const getDayOfMonth = (date) => addZeroBefore(date.getDate());
-const getMonthNumber = (date) => addZeroBefore(date.getMonth());
-const getHours = (date) => addZeroBefore(date.getHours());
-const getMinutes = (date) => addZeroBefore(date.getMinutes());
-const getSeconds = (date) => addZeroBefore(date.getSeconds());
 const getMonthName = (date) => MONTH_NAMES[date.getMonth()];
 
 export const getHumanDate = (date) => `${getDayOfMonth(date)} ${getMonthName(date)} ${date.getFullYear()}`;
-export const getHumanDateTime = (date) => {
-  const years = date.getFullYear();
-  const months = getMonthNumber(date);
-  const days = getDayOfMonth(date);
-  const hours = getHours(date);
-  const minutes = getMinutes(date);
-  const seconds = getSeconds(date);
-
-  return `${years}/${months}/${days} ${hours}:${minutes}:${seconds}`;
-};
 
 export const getHouresFromDuration = (duration) => Math.floor(duration/OtherDuration.MINUTES_IN_HOUR);
 export const getRestMinutesFromDuration = (duration) => duration % OtherDuration.MINUTES_IN_HOUR;

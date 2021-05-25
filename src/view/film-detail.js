@@ -1,7 +1,7 @@
 import he from 'he';
 import SmartView from './smart.js';
 import {getCheckedAttribute, getDisabledAttribute} from '../utils/common';
-import {getHumanDate, getTimeAgo} from '../utils/date';
+import {getHumanDate, getHumanDuration, getTimeAgo} from '../utils/date';
 
 const createCommentTemplate = (comment, isDisabled, commentIdForDelete) => {
   const {
@@ -73,6 +73,7 @@ const createFilmDetailTemplate = (data, allComments) => {
   const actorsTemplate = getListCommaSeparatedTemplate(actors);
   const genresTemplate = getGenresTemplate(genres);
   const humanPremiereDate = getHumanDate(premiere);
+  const humanDuration = getHumanDuration(duration);
   const filmComments = getFilmComments(comments, allComments);
   const commentsLength = comments.length;
   const commentsTemplate = filmComments.map((film) => createCommentTemplate(film, isDisabled, commentIdForDelete)).join('');
@@ -129,7 +130,7 @@ const createFilmDetailTemplate = (data, allComments) => {
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Runtime</td>
-              <td class="film-details__cell">${duration}</td>
+              <td class="film-details__cell">${humanDuration}</td>
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Country</td>
@@ -242,12 +243,23 @@ export default class FilmDetail extends SmartView {
     this._localCommentTextElement = this._getLocalCommentTextElement();
   }
 
-  _getLocalCommentTextElement() {
-    return this.getElement().querySelector('.film-details__comment-input');
-  }
-
   getTemplate() {
     return createFilmDetailTemplate(this._data, this._allComments);
+  }
+
+  restoreHandlers() {
+    this._setInnerHandlers();
+  }
+
+  rollBackChanges() {
+    this.updateData({
+      isDisabled: false,
+      commentIdForDelete: null,
+    });
+  }
+
+  _getLocalCommentTextElement() {
+    return this.getElement().querySelector('.film-details__comment-input');
   }
 
   _closeFilmPopupHandler(evt) {
@@ -281,36 +293,9 @@ export default class FilmDetail extends SmartView {
     this._callback.commentDeleteClickHandler(commentId);
   }
 
-  static parseFilmToState(film) {
-    return {
-      ...film,
-      localComment: null,
-      localCommentEmotion: null,
-      scrollTop: null,
-      isDisabled: false,
-      commentIdForDelete: null,
-    };
-  }
-
-  static parseStateToFilm(data) {
-    data = {
-      ...data,
-    };
-
-    delete data.localComment;
-    delete data.localCommentEmotion;
-    delete data.scrollTop;
-
-    return data;
-  }
-
   _restorePosition() {
     this.getElement().scrollTop = this._data.scrollTop;
     this._localCommentTextElement.scrollTop = this._data.localCommentScrollTop;
-  }
-
-  restoreHandlers() {
-    this._setInnerHandlers();
   }
 
   _setInnerHandlers() {
@@ -357,13 +342,6 @@ export default class FilmDetail extends SmartView {
         emotion: this._data.localCommentEmotion,
       });
     }
-  }
-
-  rollBackChanges() {
-    this.updateData({
-      isDisabled: false,
-      commentIdForDelete: null,
-    });
   }
 
   setClosePopupHandler(callback) {
@@ -417,5 +395,28 @@ export default class FilmDetail extends SmartView {
     }
 
     this._localCommentTextElement.addEventListener('keydown', this._localCommentAddHandler);
+  }
+
+  static parseFilmToState(film) {
+    return {
+      ...film,
+      localComment: null,
+      localCommentEmotion: null,
+      scrollTop: null,
+      isDisabled: false,
+      commentIdForDelete: null,
+    };
+  }
+
+  static parseStateToFilm(data) {
+    data = {
+      ...data,
+    };
+
+    delete data.localComment;
+    delete data.localCommentEmotion;
+    delete data.scrollTop;
+
+    return data;
   }
 }
