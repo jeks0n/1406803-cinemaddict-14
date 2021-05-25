@@ -3,13 +3,15 @@ import {getFilterTypeFromId} from '../utils/filter';
 import {MenuItem} from '../const';
 
 const createMainNavigationItemTemplate = ({id, type, name, count, hasCount}, currentFilterType) => {
+  const spanCount = hasCount ?
+    `<span class="main-navigation__item-count" data-menu-type="${MenuItem.FILTER}">${count}</span>`
+    : '';
+
   return `<a id="${id}"
              href="#${type}"
              class="main-navigation__item ${type === currentFilterType ? 'main-navigation__item--active' : ''}"
              data-menu-type="${MenuItem.FILTER}"
-             >${name} ${hasCount
-  ? '<span class="main-navigation__item-count" data-menu-type="' + MenuItem.FILTER + '">' + count + '</span>'
-  : ''}
+             >${name} ${spanCount}
           </a>`;
 };
 

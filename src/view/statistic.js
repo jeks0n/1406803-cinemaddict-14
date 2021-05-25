@@ -155,6 +155,11 @@ export default class Statistic extends SmartView {
     this._setCharts();
   }
 
+  _setCharts() {
+    const statisticCtx = this.getElement().querySelector('.statistic__chart');
+    renderChart(statisticCtx, this._data);
+  }
+
   _periodChangeHandler(evt) {
     evt.preventDefault();
     this.updateData({
@@ -166,10 +171,5 @@ export default class Statistic extends SmartView {
   _setPeriodChangeHandler() {
     this.getElement().querySelectorAll('.statistic__filters-input').forEach((item) =>
       item.addEventListener('change', this._periodChangeHandler));
-  }
-
-  _setCharts() {
-    const statisticCtx = this.getElement().querySelector('.statistic__chart');
-    renderChart(statisticCtx, this._data);
   }
 }

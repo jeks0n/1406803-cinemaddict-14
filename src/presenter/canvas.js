@@ -55,7 +55,6 @@ export default class Canvas {
     this._handleModeChange = this._handleModeChange.bind(this);
     this._handleLoadMoreButtonClick = this._handleLoadMoreButtonClick.bind(this);
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
-    this._renderCanvas = this._renderCanvas.bind(this);
 
     this._filmsModel.addObserver(this._handleModelEvent);
     this._filterModel.addObserver(this._handleModelEvent);
@@ -63,6 +62,22 @@ export default class Canvas {
 
   init() {
     this._renderCanvas();
+  }
+
+  hide() {
+    this._allFilmSectionComponent.hide();
+    this._topRatedSectionComponent.hide();
+    this._mostCommentedSectionComponent.hide();
+    this._noFilmComponent.hide();
+    this._sortComponent.hide();
+  }
+
+  show() {
+    this._allFilmSectionComponent.show();
+    this._topRatedSectionComponent.show();
+    this._mostCommentedSectionComponent.show();
+    this._noFilmComponent.show();
+    this._sortComponent.show();
   }
 
   _getAllFilms() {
@@ -238,22 +253,6 @@ export default class Canvas {
     if (resetSortType) {
       this._currentSortType = SortType.DEFAULT;
     }
-  }
-
-  hide() {
-    this._allFilmSectionComponent.hide();
-    this._topRatedSectionComponent.hide();
-    this._mostCommentedSectionComponent.hide();
-    this._noFilmComponent.hide();
-    this._sortComponent.hide();
-  }
-
-  show() {
-    this._allFilmSectionComponent.show();
-    this._topRatedSectionComponent.show();
-    this._mostCommentedSectionComponent.show();
-    this._noFilmComponent.show();
-    this._sortComponent.show();
   }
 
   _resetOpenedFilmPresenter() {

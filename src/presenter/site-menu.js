@@ -36,12 +36,16 @@ export default class SiteMenu {
     remove(prevFilterComponent);
   }
 
-  _handleModelEvent() {
-    this.init();
-  }
-
   hide() {
     this._filterComponent.hide();
+  }
+
+  setMenuClickHandler(callback) {
+    this._handleSiteMenuClick = callback;
+  }
+
+  _handleModelEvent() {
+    this.init();
   }
 
   _handleFilterTypeChange(menuItem) {
@@ -71,10 +75,6 @@ export default class SiteMenu {
     }
 
     this._handleFilterTypeChange(menuItem);
-  }
-
-  setMenuClickHandler(callback) {
-    this._handleSiteMenuClick = callback;
   }
 
   _getFilters() {
